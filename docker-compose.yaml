@@ -1,0 +1,16 @@
+services:
+  tensorflow:
+    container_name: tensorflow
+    build: ./app/tensorflow
+    networks: [leaf]
+    volumes:
+      - ./src:/src
+      - ~/goinfre:/goinfre
+    restart: on-failure
+    env_file:
+      - .env
+
+
+networks:
+  leaf:
+    name: leaf

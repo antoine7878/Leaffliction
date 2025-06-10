@@ -15,7 +15,7 @@ from keras.applications import EfficientNetV2B0  # type: ignore
 from keras.utils import image_dataset_from_directory  # type: ignore
 from keras.layers import GlobalAveragePooling2D, Dense, Dropout  # type: ignore
 
-from src.utils import listdir_dirs, listdir_files
+from utils import listdir_dirs, listdir_files
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
@@ -30,6 +30,7 @@ def pars_args():
 
 
 def load_sets(in_folder: str, out_folder: str, test_split: float):
+    shutil.rmtree(out_folder)
     os.mkdir(out_folder)
     os.mkdir(join(out_folder, "train"))
     os.mkdir(join(out_folder, "test"))

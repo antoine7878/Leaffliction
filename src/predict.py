@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from keras.saving import load_model  # type: ignore
 from keras.utils import image_dataset_from_directory  # type: ignore
 
-from src.utils import listdir_files
+from utils import listdir_files
 
 
 def parse_args():

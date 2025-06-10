@@ -12,7 +12,7 @@ from skimage.io import imread, imsave
 
 from src.utils import listdir_dirs, listdir_files, n_randchoices
 from Distribution import count_class
-from src.transform import TRANSFORMS
+from transform import TRANSFORMS
 
 warnings.filterwarnings("ignore", message="This might be a color image")
 

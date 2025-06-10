@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from skimage.io import imread, imsave
 
 from Distribution import count_class
-from src.augment import AUGMENTATIONS
-from src.utils import listdir_dirs, listdir_files, n_randchoices
+from augment import AUGMENTATIONS
+from utils import listdir_dirs, listdir_files, n_randchoices
 
 warnings.filterwarnings("ignore", message="This might be a color image")
 

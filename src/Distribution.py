@@ -5,7 +5,7 @@ import sys
 from collections import Counter
 import matplotlib.pyplot as plt
 
-from src.utils import listdir_dirs
+from utils import listdir_dirs
 
 
 def main():
