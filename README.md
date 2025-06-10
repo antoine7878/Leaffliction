@@ -1,13 +1,12 @@
 # **WORK IN PROGRESS** Leaffliction
 
-**Leaffliction** is a computer vision project focused on classifying images of plant leaf diseases. The project involes data processing: training set Analysis, Augmentation and Features extraction. Model selection, training and evaluation.
+**Leaffliction** is a computer vision project focused on classifying images of plant leaf diseases. The project involes data processing: training set Ditribution Analysis and Augmentation. Model selection, training and evaluation.
 
 ## ⚙️ Features
 
 - **Dataset Analysis**: Parses a leaf image dataset and visualizes class distributions via pie and bar charts.
 - **Data Augmentation**: Generates image variations (flip, rotate, scale, contrast, luminosity, blur) to balance class distributions.
-**Image Transformation**: Features extraction like Gaussian blur, masks, ROI detection, and color histograms.
-- **Model Training**: Trains a classifier on the processed dataset and saves model weights and transformation artifacts.
+- **Model Training**: Fine-tune an EfficientNet based classifier model.
 - **Prediction**: Loads trained model to classify new leaf images and outputs the predicted disease.
 
 ## 🖼️ Dataset and Model
