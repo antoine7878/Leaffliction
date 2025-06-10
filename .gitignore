@@ -1,0 +1,7 @@
+images
+.keras
+.vscode
+__pycache__
+.cache/
+.venv
+*.npy
