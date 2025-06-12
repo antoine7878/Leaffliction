@@ -4,6 +4,8 @@
 
 ## 🔨 Try it yourself
 
+Dataset should be located in your home: ~/goinfre/images/Apple_Black_rot/image (1).JPG ...
+
 ```
 make distribution
 make augmentation
