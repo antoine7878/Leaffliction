@@ -10,7 +10,7 @@ Dataset should be located in your home: ~/goinfre/images/Apple_Black_rot/image (
 make distribution
 make augmentation
 make train
-make predi
+make predict
 ```
 
 ## ⚙️ Features
