@@ -1,14 +1,15 @@
 #!python
 
 import os
+import json
+import rembg
 import zipfile
 import argparse
-import json
 from pathlib import Path
 from os.path import basename, join, dirname
 
-from skimage.io import imread
 import numpy as np
+from skimage.io import imread
 import matplotlib.pyplot as plt
 from keras.saving import load_model  # type: ignore
 from keras.utils import image_dataset_from_directory  # type: ignore
@@ -30,18 +31,18 @@ def main():
     file, archive_name = parse_args()
 
     with zipfile.ZipFile(archive_name, mode="r") as archive:
-        extract_folder = join(dirname(archive_name), Path(archive_name).stem)
-        archive.extractall(extract_folder)
+        extract_dir = join(dirname(archive_name), Path(archive_name).stem)
+        archive.extractall(extract_dir)
 
-    model = load_model(join(extract_folder, "model.keras"))
+    model = load_model(join(extract_dir, "model.keras"))
 
-    with open(join(extract_folder, "class_names.json"), "r") as openfile:
+    with open(join(extract_dir, "class_names.json"), "r") as openfile:
         class_names = json.load(openfile)
 
     if not file:
-        eval_model(extract_folder, model)
+        eval_model(extract_dir, model)
     elif os.path.isdir(file):
-        preict_dir(file, model, class_names)
+        predict_dir(file, model, class_names)
     elif os.path.isfile(file):
         predict_file(file, model, class_names)
     else:
@@ -54,35 +55,58 @@ def predict_file(file, model, class_names):
     class_index = np.argmax(pred)
     class_pred = class_names[class_index]
 
-    print(os.path.basename(file))
-    print(class_pred)
+    print('Dirname:', basename(dirname(file)))
+    print("Prediction", class_pred)
 
-    ax = plt.subplot(1, 1, 1)
+    fig = plt.figure()
+    fig.patch.set_facecolor("#1e1e1e")
+    ax = plt.subplot()
     ax.axis("off")
-    plt.title(f"{basename(file)}\n{class_pred}", loc="center")
+    plt.title(
+        f"== Class predicted: {class_pred} ==",
+        fontdict={"fontsize": 20, "color": "limegreen"},
+    )
     ax = plt.subplot(1, 2, 1)
-    ax.axis("off")
+    rm_ticks()
     plt.imshow(original)
     ax = plt.subplot(1, 2, 2)
-    ax.axis("off")
-    plt.imshow(original)
+    rm_ticks()
+    plt.imshow(rembg.remove(original))
     plt.show()
 
 
-def preict_dir(dir: str, model, class_names):
-    files = []
+def rm_ticks():
+    plt.tick_params(
+        axis="both",
+        which="both",
+        bottom=False,
+        labelbottom=False,
+        left=False,
+        labelleft=False,
+    )
+
+
+def predict_dir(dir: str, model, class_names):
+    dirs = []
     imgs = []
     for file in listdir_files(dir):
-        imgs.append(imread(os.path.join(dir, file)))
-        files.append(file)
-    pred = model(np.array(imgs))
-    for p, f in zip(pred, files):
-        print(f"{f} predicted: {class_names[np.argmax(p)]}")
+        path = os.path.join(dir, file)
+        imgs.append(imread(path))
+        dirs.append(os.path.basename(os.path.dirname(path)))
+    pred = model.predict(np.array(imgs), batch_size=64)
+    print(pred)
+    correct_count = 0
+    for p, f in zip(pred, dirs):
+        predi = class_names[np.argmax(p)]
+        print(f"{f} predicted: {predi}")
+        if predi == f:
+            correct_count += 1
+    print(f"Accuracy {correct_count / len(pred):.4%}")
 
 
-def eval_model(extract_folder, model):
+def eval_model(extract_dir, model):
     ds = image_dataset_from_directory(
-        join(extract_folder, "test"),
+        join(extract_dir, "test"),
         shuffle=True,
         image_size=(256, 256),
         seed=42,

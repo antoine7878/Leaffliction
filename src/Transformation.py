@@ -10,7 +10,7 @@ import concurrent.futures
 import matplotlib.pyplot as plt
 from skimage.io import imread, imsave
 
-from src.utils import listdir_dirs, listdir_files, n_randchoices
+from utils import listdir_dirs, listdir_files, n_randchoices
 from Distribution import count_class
 from transform import TRANSFORMS
 
@@ -23,35 +23,33 @@ def pars_args():
     )
     parser.add_argument("file")
     parser.add_argument("-o", "--out", type=str)
-    parser.add_argument("--clean", action="store_true")
+    parser.add_argument("--save", action="store_true")
     args = parser.parse_args()
     return args
 
 
 def tranformation():
     args = pars_args()
-    if args.clean:
-        clean_folder(args)
-    elif os.path.isfile(args.file):
+    if os.path.isfile(args.file):
         assert args.file.lower().endswith(".jpg"), f"{args.file}: wrong format"
-        images = augment_file(args.file, args.out, TRANSFORMS)
+        images = transform_file(args.file, args.out, TRANSFORMS, args.save)
         plot_images(images)
     elif os.path.isdir(args.file):
-        augment_folder(args)
+        transform_folder(args)
     else:
         raise TypeError(f"{args.file} not found")
 
 
-def augment_folder(args):
+def transform_folder(args):
     counter = count_class(args.file)
 
     pool = concurrent.futures.ThreadPoolExecutor(max_workers=8)
 
     for sub in listdir_dirs(args.file):
-        pool.submit(augment_subfolder, counter, sub, args)
+        pool.submit(transform_subfolder, counter, sub, args)
 
 
-def augment_subfolder(counter, sub, args):
+def transform_subfolder(counter, sub, args):
     trans = TRANSFORMS
     total_files = counter.most_common(1)[0][1] - counter[sub]
     ts_per_file = math.ceil(total_files / counter[sub])
@@ -60,22 +58,25 @@ def augment_subfolder(counter, sub, args):
     sub = os.path.join(args.file, sub)
     for f in n_randchoices(listdir_files(sub), total_files):
         random.shuffle(trans)
-        augment_file(
+        transform_file(
             os.path.join(sub, f),
             args.out,
-            trans[0: min(ts_per_file, total_files)],
+            trans[0 : min(ts_per_file, total_files)],
+            args.save,
         )
         total_files -= ts_per_file
         if total_files < 1:
             break
 
 
-def augment_file(file, dir, ts):
+def transform_file(file, dir, ts, save):
     img = imread(file)
     images = {"Original": img}
     for t in ts:
         images[t.__doc__] = t(img)
-    return save_images(images, dir, file)
+    if save:
+        return save_images(images, dir, file)
+    return images
 
 
 def save_images(images: dict, dir: str, file: str):
@@ -92,25 +93,6 @@ def save_images(images: dict, dir: str, file: str):
     return images
 
 
-def clean_folder(args):
-    files = []
-    for sub in listdir_dirs(args.file):
-        for file in os.listdir(os.path.join(args.file, sub)):
-            if "_" in file:
-                files.append(os.path.join(args.file, sub, file))
-                print(sub, file)
-    if len(files) == 0:
-        print("Nothing to delete")
-        return
-    answer = input("Confirm deletion: y/[n]:")
-    if answer == "y":
-        for file in files:
-            os.remove(file)
-        print("Deleted")
-    else:
-        print("Canceled")
-
-
 def plot_images(images: dict):
     for i, (key, img) in enumerate(images.items()):
         plt.subplot(1, len(images), i + 1)
@@ -121,10 +103,11 @@ def plot_images(images: dict):
         plt.xlabel(key)
 
     plt.show()
+    # histogram(images["Original"])
 
 
 if __name__ == "__main__":
-    # try:
-    tranformation()
-# except Exception as error:
-#     print(type(error).__name__ + ":", error)
+    try:
+        tranformation()
+    except Exception as error:
+        print(type(error).__name__ + ":", error)

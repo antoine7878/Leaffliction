@@ -17,7 +17,7 @@ from keras.layers import GlobalAveragePooling2D, Dense, Dropout  # type: ignore
 
 from utils import listdir_dirs, listdir_files
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def pars_args():
@@ -30,7 +30,8 @@ def pars_args():
 
 
 def load_sets(in_folder: str, out_folder: str, test_split: float):
-    shutil.rmtree(out_folder)
+    if os.path.isdir(out_folder):
+        shutil.rmtree(out_folder, ignore_errors=True)
     os.mkdir(out_folder)
     os.mkdir(join(out_folder, "train"))
     os.mkdir(join(out_folder, "test"))
@@ -60,18 +61,19 @@ def main():
     load_sets(in_folder, out_folder, 0.1)
 
     train_ds, val_ds = image_dataset_from_directory(
-        in_folder,
+        join(out_folder, "train"),
         shuffle=True,
         image_size=(256, 256),
         validation_split=0.2,
         seed=42,
-        batch_size=256,
+        batch_size=32,
         subset="both",
         label_mode="categorical",
     )
     class_names = train_ds.class_names
     model, base_model = build_model(len(class_names))
     base_model.trainable = False
+    model.summary()
     print("Refining")
     train_model(model, 1e-3, train_ds, val_ds)
     base_model.trainable = True
