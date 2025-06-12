@@ -8,6 +8,7 @@ Dataset should be located in your home: ~/goinfre/images/Apple_Black_rot/image (
 
 ```
 conda env create -f ./environment.yml
+conda activate leaf
 make distribution
 make augmentation
 make train
