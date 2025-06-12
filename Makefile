@@ -1,3 +1,4 @@
+
 distribution:
 	python src/Distribution.py ~/goinfre/images
 
@@ -22,4 +23,4 @@ predict1:
 predictf:
 	python src/predict.py ~/goinfre/Leaffliction.zip -f ~/goinfre/images/Apple_rust/
 
-.PHONY: train eval
+.PHONY: train eval all clean
