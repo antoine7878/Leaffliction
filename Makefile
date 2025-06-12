@@ -1,4 +1,4 @@
-distribution: goinfre
+distribution:
 	python src/Distribution.py ~/goinfre/images
 
 augmentation:
