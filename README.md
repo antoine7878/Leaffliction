@@ -26,7 +26,7 @@ make predict
 
 - Dataset: subset of [plantvillage dataset](https://www.kaggle.com/datasets/emmarex/plantdisease) (Apple and Grape)
 - Simple shallow CNN model achieves over 96% accuracy
-- EfficientNetV2B0 based model achieves over 99.6% accuracy
+- EfficientNetV2B0 based model achieves over 99.96% accuracy
 
 ## 🧠 Learning Objectives
 
